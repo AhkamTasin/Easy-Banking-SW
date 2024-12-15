@@ -31,6 +31,8 @@ int main(){
     int opt,choice;
     char cont='y';
     float amount;
+    int oploan,loanch;
+     
 
     printf("\n\033[1;32mWhat do you want to do?\033[0m\n"); 
     printf("\n\n1. Register an account");
@@ -114,6 +116,7 @@ int main(){
                     printf("| 4. Online Transfer.                 |\n");
                     printf("| 5. Password Change.                 |\n");
                     printf("| 6. Check Your Registration Details  |\n");
+                    printf("| 7. All about Loan                   |\n");
                     printf("+-------------------------------------+\n");
                     printf("\033[0m");
                     printf("\n\nYour choice:\t");
@@ -228,10 +231,89 @@ int main(){
                                 printf("\nPassword not matched.\t");
                                 fclose(fp);
                             }
+                            break;
+                        case 7:
+                            system("cls");
+                            printf("|----------------About Loan-----------------|\n");
+                            printf("| 1. Take a Loan                            |\n");
+                            printf("| 2. Pay your monthly payment of Loan       |\n");
+                            printf("|-------------------------------------------|\n");
+                            printf("\nWhat is your choice?\t");
+                            printf("\n\nYour choice:\t");
+                            scanf("%d",&oploan);
+
+                            if(oploan==1){
+                                system("cls");
+                                printf("How much of a loan do you want?\n");
+                                printf("1. 1,00000 Taka - (You must have at least 10,000 Taka in your main balance)\n");
+                                printf("2. 2,00000 Taka - (You must have at least 50,000 Taka in your main balance)\n");
+                                printf("3. 5,00000 Taka - (You must have at least 1,00000 Taka in your main balance)\n");
+                                printf("\n\nCaution: [You must pay at least 10,000 Taka in every month.\n If you miss this 2%% charge of total loan amount will be added.\nIf you do advance deposit, no charge will be added]\n");
+
+                                printf("\n\nYour choice:\t");
+                                scanf("%d",&loanch);
+                                if(loanch==1){
+                                    fp=fopen(filename,"r");
+                                    fread(&usr,sizeof(struct user),1,fp);
+                                    if(usr.balance>=10000){
+                                        fclose(fp);
+                                        fp=fopen(filename,"w");
+                                        usr.balance+=100000;
+                                        fwrite(&usr,sizeof(struct user),1,fp);
+                                        fclose(fp);
+                                        printf("\nLoan of 1,00000 Taka activated successfully...\n");
+                                    }
+                                    else
+                                    {
+                                        printf("\nYou have no sufficient balance to take this Loan.\n");
+                                    }
+                                }
+                                else if(loanch==2){
+                                    fp=fopen(filename,"r");
+                                    fread(&usr,sizeof(struct user),1,fp);
+                                    if(usr.balance>=50000){
+                                        fclose(fp);
+                                        fp=fopen(filename,"w");
+                                        usr.balance+=200000;
+                                        fwrite(&usr,sizeof(struct user),1,fp);
+                                        fclose(fp);
+                                        printf("\nLoan of 2,00000 Taka activated successfully...\n");
+                                    }
+                                    else
+                                    {
+                                        printf("\nYou have no sufficient balance to take this Loan.\n");
+                                    }
+                                }
+                                else if(loanch==3){
+                                    fp=fopen(filename,"r");
+                                    fread(&usr,sizeof(struct user),1,fp);
+                                    if(usr.balance>=100000){
+                                        fclose(fp);
+                                        fp=fopen(filename,"w");
+                                        usr.balance+=500000;
+                                        fwrite(&usr,sizeof(struct user),1,fp);
+                                        fclose(fp);
+                                        printf("\nLoan of 5,00000 Taka activated successfully...\n");
+                                    }
+                                    else
+                                    {
+                                        printf("\nYou have no sufficient balance to take this Loan.\n");
+                                    }
+                                }
+                                
+                            }
+                        
+
+
+
+
+
+
+
 
                     }
 
-                    printf("\n\nDo you want to continiue the transaction [y/n]");
+                    printf("\n\nDo you want to continue the transaction? [y/n] ");
                     scanf("%s",&cont);
                 }
             }
