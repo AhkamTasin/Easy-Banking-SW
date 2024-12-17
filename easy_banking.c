@@ -26,7 +26,7 @@ struct user{
     float extra_charge;
 };
 
-int main(){
+int main(){ 
     struct user usr,usr1;
 
     FILE *fp;
@@ -122,7 +122,7 @@ int main(){
                     printf("+-------------------------------------+\n");
                     printf("| 1. Balance Inquiry.                 |\n");
                     printf("| 2. Depositing Cash.                 |\n");
-                    printf("| 3. Cash Withdrawl.                  |\n");
+                    printf("| 3. Cash Withdrawal.                 |\n");
                     printf("| 4. Online Transfer.                 |\n");
                     printf("| 5. Password Change.                 |\n");
                     printf("| 6. Check Your Registration Details  |\n");
@@ -298,97 +298,77 @@ int main(){
                                     printf("\nInvalid loan choice.\n");
                                 }
                             }
-                            else if (oploan == 2) {
-                            system("cls");
-                            if (usr.loan_amount == 0) {
-                            printf("\nYou have no active loans.\n");
-                            } else {
-                                printf("\nYour current loan balance: Tk. %.2f", usr.loan_amount);
-                                printf("\nYour monthly payment: Tk. %.2f", usr.monthly_payment);
-                                printf("\nYour penalties so far: Tk. %.2f", usr.extra_charge); // Display penalties
-                                printf("\nEnter the amount you want to pay: \t");
-                                scanf("%f", &amount);
-
-                                // Get the current date
-                                char currentDate[15];
-                                time_t t = time(NULL);
-                                struct tm tm = *localtime(&t);
-                                sprintf(currentDate, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-
-                                // Manually parse the last payment date
-                                int lastYear, lastMonth, lastDay;
-                                sscanf(usr.last_payment_date, "%d-%d-%d", &lastYear, &lastMonth, &lastDay);
-
-                                // Get the current date parts
-                                int currentYear = tm.tm_year + 1900;
-                                int currentMonth = tm.tm_mon + 1;
-                                int currentDay = tm.tm_mday;
-
-                                // Calculate the difference in days
-                                int days_diff = 0;
-
-                                // If the last payment date is older than the current date, calculate the difference
-                                if (currentYear > lastYear || (currentYear == lastYear && currentMonth > lastMonth) || (currentYear == lastYear && currentMonth == lastMonth && currentDay > lastDay)) {
-                                    // Convert the last payment date and current date to days since a fixed point (e.g., 01/01/1900)
-                                    int totalLastDays = lastYear * 365 + lastMonth * 30 + lastDay;
-                                    int totalCurrentDays = currentYear * 365 + currentMonth * 30 + currentDay;
-
-                                    // Calculate the number of days between the last payment date and current date
-                                    days_diff = totalCurrentDays - totalLastDays;
+                            else if (oploan == 2)
+                            {
+                                system("cls");
+                                if (usr.loan_amount == 0)
+                                {
+                                    printf("\nYou have no active loans.\n");
                                 }
+                                else
+                                {
+                                    printf("\nYour current loan balance: Tk. %.2f", usr.loan_amount);
+                                    printf("\nYour monthly payment: Tk. %.2f", usr.monthly_payment);
+                                    printf("\nYour penalties so far: Tk. %.2f", usr.extra_charge); // Display penalties
+                                    printf("\nEnter the amount you want to pay: \t");
+                                    scanf("%f", &amount);
 
-                                // If there are overdue payments
-                                if (days_diff > 30) {
-                                    int missed_months = days_diff / 30; // Calculate the number of missed months
-                                    usr.extra_charge = usr.loan_amount * 0.02 * missed_months; // Apply 2% penalty for missed months
-                                    usr.loan_amount += usr.extra_charge; // Add the penalty to the loan amount
-                                    printf("\nYou missed %d month(s) of payments. An extra penalty of Tk. %.2f has been added.\n", missed_months, usr.extra_charge);
-                                }
+                                    // Get the current date
+                                    char currentDate[15];
+                                    time_t t = time(NULL);
+                                    struct tm tm = *localtime(&t);
+                                    sprintf(currentDate, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 
-                                // If the payment covers the loan amount
-                                if (amount >= usr.loan_amount) {
-                                    usr.loan_amount = 0;
-                                    printf("\nLoan fully repaid! Congratulations!\n");
-                                } else {
-                                    usr.loan_amount -= amount;
-                                    printf("\nPayment of Tk. %.2f accepted. Remaining loan balance: Tk. %.2f\n", amount, usr.loan_amount);
-                                }
+                                    // Parse the last payment date
+                                    int lastYear, lastMonth, lastDay;
+                                    sscanf(usr.last_payment_date, "%d-%d-%d", &lastYear, &lastMonth, &lastDay);
 
-                                // Calculate how many months are skipped if the user pays more than the required monthly amount
-                                int monthsSkipped = 0;
-                                if (amount > usr.monthly_payment) {
-                                    monthsSkipped = (int)(amount / usr.monthly_payment); // Determine how many months the payment covers
-                                    if (monthsSkipped > 1) {
-                                        printf("\nYou have paid for the next %d month(s).\n", monthsSkipped - 1); // Display the skipped months
+                                    // Calculate the number of months skipped
+                                    int monthsSkipped = (int)(amount / usr.monthly_payment);
+
+                                    if (monthsSkipped > 0)
+                                    {
+                                        printf("\nYou have paid for the next %d month(s).\n", monthsSkipped);
                                     }
+
+                                    // Update the loan balance
+                                    if (amount >= usr.loan_amount)
+                                    {
+                                        usr.loan_amount = 0; // Loan fully paid
+                                        printf("\nLoan fully repaid! Congratulations!\n");
+                                    }
+                                    else
+                                    {
+                                        usr.loan_amount -= amount;
+                                        printf("\nPayment of Tk. %.2f accepted. Remaining loan balance: Tk. %.2f\n", amount, usr.loan_amount);
+                                    }
+
+                                    // Calculate the next payment date
+                                    int nextYear = lastYear;
+                                    int nextMonth = lastMonth + monthsSkipped;
+
+                                    while (nextMonth > 12)
+                                    {
+                                        nextMonth -= 12;
+                                        nextYear++;
+                                    }
+
+                                    // Update the next payment date
+                                    char nextPaymentDate[15];
+                                    sprintf(nextPaymentDate, "%04d-%02d-%02d", nextYear, nextMonth, lastDay);
+
+                                    // Display the next payment date
+                                    printf("\nYour next payment is due on: %s\n", nextPaymentDate);
+
+                                    // Update the user's payment record
+                                    strcpy(usr.last_payment_date, nextPaymentDate);
+
+                                    // Save the updated data to the file
+                                    fp = fopen(filename, "w");
+                                    fwrite(&usr, sizeof(struct user), 1, fp);
+                                    fclose(fp);
                                 }
-
-                                // Calculate the next payment date (add skipped months)
-                                int nextYear = currentYear;
-                                int nextMonth = currentMonth + monthsSkipped; // Add skipped months to the current month
-        
-                                // Handle month rollover
-                                while (nextMonth > 12) {
-                                    nextMonth -= 12;
-                                    nextYear++;
-                                }
-
-                                // Set the next payment date
-                                char nextPaymentDate[15];
-                                sprintf(nextPaymentDate, "%04d-%02d-%02d", nextYear, nextMonth, currentDay);
-
-                                // Display the next payment date
-                                printf("\nYour next payment is due on: %s\n", nextPaymentDate);
-
-                                // Update last payment date
-                                strcpy(usr.last_payment_date, currentDate);
-
-                                // Save to file
-                                fp = fopen(filename, "w");
-                                fwrite(&usr, sizeof(struct user), 1, fp);
-                                fclose(fp);
                             }
-                        }
                     }
 
                     printf("\n\nDo you want to continue the transaction? [y/n] ");
